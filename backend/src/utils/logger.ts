@@ -1,4 +1,4 @@
-import winston from 'winston'
+import * as winston from 'winston'
 
 /**
  * Create a logger instance to write log messages in JSON format.
@@ -10,6 +10,8 @@ export function createLogger(loggerName: string) {
     level: 'info',
     format: winston.format.json(),
     defaultMeta: { name: loggerName },
-    transports: [new winston.transports.Console()]
+    transports: [
+      new winston.transports.Console()
+    ]
   })
 }

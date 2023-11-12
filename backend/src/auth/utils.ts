@@ -1,8 +1,7 @@
 import { decode } from 'jsonwebtoken'
-import { createLogger } from '../utils/logger.js'
-import { JwtPayload } from '../lambda/auth/auth0Authorizer'
 
-const logger = createLogger('utils')
+import { JwtPayload } from './JwtPayload'
+
 /**
  * Parse a JWT token and return a user id
  * @param jwtToken JWT token to parse
