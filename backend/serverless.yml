@@ -3,10 +3,11 @@ app: serverless-todo-app
 service: serverless-todo-app
 
 plugins:
-  - serverless-iam-roles-per-function
   - serverless-webpack
+  - serverless-iam-roles-per-function
   - serverless-plugin-tracing
-
+  - serverless-reqvalidator-plugin
+  - serverless-aws-documentation
 frameworkVersion: '3'
 
 custom:
@@ -38,7 +39,7 @@ custom:
 
 provider:
   name: aws
-  runtime: nodejs12.x
+  runtime: nodejs14.x
 
   stage: ${opt:stage, 'dev'}
   region: ${opt:region, 'us-east-1'}
@@ -54,7 +55,7 @@ provider:
     TODOS_CREATED_AT_INDEX: CreatedAtIndex
     ATTACHMENT_S3_BUCKET: serverless-my-todo-${self:provider.stage}
     SIGNED_URL_EXPIRATION: 300
-    AUTH_JWKS_URL: "https://dev-jarrzq17.eu.auth0.com/.well-known/jwks.json"
+    AUTH_JWKS_URL: "https://dev-vumnfz4bqser5s55.us.auth0.com/.well-known/jwks.json"
 
   logs:
   # Enable API Gateway logs
@@ -262,21 +263,16 @@ resources:
     # TODO: Complete the policy below and attach it to the bucket defined above
     # For cross referencing the name of the bucket, use "!Ref AttachmentsBucket"
     
-    BucketPolicy:
+    AttachmentsBucketPolicy:
       Type: AWS::S3::BucketPolicy
       Properties:
         PolicyDocument:
           Id: MyPolicy
-          Version: "2012-10-17"
+          Version: '2012-10-17'
           Statement:
             - Sid: PublicReadForGetBucketObjects
               Effect: Allow
-              Principal: "*"
-              Action: "s3:GetObject"
-              Resource: "arn:aws:s3:::${self:provider.environment.ATTACHMENT_S3_BUCKET}/*"
-            - Sid: PublicPutObjects
-              Effect: Allow
-              Principal: "*"
-              Action: "s3:PutObject"
-              Resource: "arn:aws:s3:::${self:provider.environment.ATTACHMENT_S3_BUCKET}/*"
-      Bucket: !Ref AttachmentsBucket
+              Principal: '*'
+              Action: 's3:GetObject'
+              Resource: 'arn:aws:s3:::${self:provider.environment.ATTACHMENT_S3_BUCKET}/*'
+        Bucket: !Ref AttachmentsBucket

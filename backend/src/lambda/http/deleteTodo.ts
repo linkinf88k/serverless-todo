@@ -14,27 +14,24 @@ export const handler = middy(
   async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     logger.info('Deleting TODO', { event })
     try {
-      const todoId = event.pathParameters.todoId;
-      const userId = getUserId(event);
-      const item = await deleteTodo(todoId, userId)
+      const todoId = event.pathParameters!.todoId
+      const userId = getUserId(event)
+      const item = await deleteTodo(todoId ?? '', userId)
       return {
         statusCode: 200,
         body: JSON.stringify({
           item
         })
       }
-
     } catch (error) {
       logger.error('Error: ', error.message)
-      throw new Error(error);
+      throw new Error(error)
     }
   }
 )
 
-handler
-  .use(httpErrorHandler())
-  .use(
-    cors({
-      credentials: true
-    })
-  )
+handler.use(httpErrorHandler()).use(
+  cors({
+    credentials: true
+  })
+)
