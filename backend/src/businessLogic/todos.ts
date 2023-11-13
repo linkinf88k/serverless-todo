@@ -6,7 +6,7 @@ import { createLogger } from '../utils/logger'
 import * as uuid from 'uuid'
 import catchError from '../utils/error'
 import { TodoUpdate } from '../models/TodoUpdate'
-import { getAttachmentUrl } from '../helpers/attachmentUtils'
+import { createAttachmentUrl } from '../helpers/attachmentUtils'
 import * as Joi from 'joi'
 
 const todoAccess = new TodosAccess()
@@ -101,7 +101,7 @@ export async function deleteTodo(todoId: string, userId: string) {
 export async function generateSignedUrl(attachmentId: string): Promise<string> {
   try {
     logger.info('Generating...')
-    const uploadUrl = await getAttachmentUrl(attachmentId)
+    const uploadUrl = await createAttachmentUrl(attachmentId)
     logger.info('Signed URL generated successfully')
 
     return uploadUrl
@@ -114,11 +114,10 @@ export async function generateSignedUrl(attachmentId: string): Promise<string> {
 export async function updateAttachmentUrl(
   userId: string,
   todoId: string,
-  attachmentId: string
+  uploadUrl: string
 ): Promise<void> {
   try {
-    const attachmentUrl = getAttachmentUrl(attachmentId)
-    await todoAccess.updateTodoItemAttachment(userId, todoId, attachmentUrl)
+    await todoAccess.updateTodoItemAttachment(userId, todoId, uploadUrl)
 
     logger.info('AttachmentURL updated successfully', {
       userId,
