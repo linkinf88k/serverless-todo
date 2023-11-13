@@ -1,4 +1,4 @@
-import { TodosAccess } from './todosAcess'
+import { TodosAccess } from '../dataAccess/todosAcess'
 import { TodoItem } from '../models/TodoItem'
 import { CreateTodoRequest } from '../requests/CreateTodoRequest'
 import { UpdateTodoRequest } from '../requests/UpdateTodoRequest'
@@ -6,7 +6,7 @@ import { createLogger } from '../utils/logger'
 import * as uuid from 'uuid'
 import catchError from '../utils/error';
 import { TodoUpdate } from '../models/TodoUpdate';
-import { getAttachmentUrl } from './attachmentUtils'
+import { getAttachmentUrl } from '../helpers/attachmentUtils'
 import * as Joi from 'joi'
 
 
