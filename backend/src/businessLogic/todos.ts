@@ -6,7 +6,7 @@ import { createLogger } from '../utils/logger'
 import * as uuid from 'uuid'
 import catchError from '../utils/error';
 import { TodoUpdate } from '../models/TodoUpdate';
-import { getAttachmentUrl } from '../helpers/attachmentUtils'
+import { getAttachmentUrl, createAttachmentUrl } from '../helpers/attachmentUtils'
 import * as Joi from 'joi'
 
 
@@ -106,7 +106,7 @@ export async function deleteTodo(
 export async function generateSignedUrl(attachmentId: string): Promise<string> {
   try {
     logger.info('Generating...')
-    const uploadUrl = await getAttachmentUrl(attachmentId)
+    const uploadUrl = await createAttachmentUrl(attachmentId)
     logger.info('Signed URL generated successfully')
 
     return uploadUrl
