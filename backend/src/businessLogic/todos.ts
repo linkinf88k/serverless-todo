@@ -6,7 +6,10 @@ import { createLogger } from '../utils/logger'
 import * as uuid from 'uuid'
 import catchError from '../utils/error'
 import { TodoUpdate } from '../models/TodoUpdate'
-import { createAttachmentUrl } from '../helpers/attachmentUtils'
+import {
+  getAttachmentUrl,
+  createAttachmentUrl
+} from '../helpers/attachmentUtils'
 import * as Joi from 'joi'
 
 const todoAccess = new TodosAccess()
@@ -114,10 +117,11 @@ export async function generateSignedUrl(attachmentId: string): Promise<string> {
 export async function updateAttachmentUrl(
   userId: string,
   todoId: string,
-  uploadUrl: string
+  attachmentId: string
 ): Promise<void> {
   try {
-    await todoAccess.updateTodoItemAttachment(userId, todoId, uploadUrl)
+    const attachmentUrl = getAttachmentUrl(attachmentId)
+    await todoAccess.updateTodoItemAttachment(userId, todoId, attachmentUrl)
 
     logger.info('AttachmentURL updated successfully', {
       userId,
