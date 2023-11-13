@@ -4,35 +4,33 @@ import { CreateTodoRequest } from '../requests/CreateTodoRequest'
 import { UpdateTodoRequest } from '../requests/UpdateTodoRequest'
 import { createLogger } from '../utils/logger'
 import * as uuid from 'uuid'
-import catchError from '../utils/error';
-import { TodoUpdate } from '../models/TodoUpdate';
-import { getAttachmentUrl, createAttachmentUrl } from '../helpers/attachmentUtils'
+import catchError from '../utils/error'
+import { TodoUpdate } from '../models/TodoUpdate'
+import { getAttachmentUrl } from '../helpers/attachmentUtils'
 import * as Joi from 'joi'
 
-
-const todoAccess = new TodosAccess();
+const todoAccess = new TodosAccess()
 
 const logger = createLogger('Todos')
 
 // TODO: Implement businessLogic
 export async function getUserTodos(userId: string): Promise<TodoItem[]> {
   try {
-    const result = await todoAccess.getAllTodos(userId);
+    const result = await todoAccess.getAllTodos(userId)
     logger.info(`Items fetched: ${userId}`, JSON.stringify(result))
-    return result;
+    return result
   } catch (error) {
-      logger.error('Get Error', error)
-      throw new catchError(error.message, 500)
+    logger.error('Get Error', error)
+    throw new catchError(error.message, 500)
   }
 }
-
 
 export async function createTodo(
   createTodoRequest: CreateTodoRequest,
   userId: string
 ): Promise<TodoItem> {
   const todoId = uuid.v4()
-  const valid = createTodoSchema.validate(createTodoRequest);
+  const valid = createTodoSchema.validate(createTodoRequest)
   if (valid.error) {
     logger.error('VALIDATION ERROR', valid.error)
     throw new catchError(valid.error.message, 400)
@@ -44,12 +42,12 @@ export async function createTodo(
       createdAt: new Date().toISOString(),
       done: false,
       attachmentUrl: null,
-      ...createTodoRequest,
+      ...createTodoRequest
     }
 
     await todoAccess.createTodo(todoItem)
     logger.info('Created successfully', todoItem)
-    return todoItem;
+    return todoItem
   } catch (error) {
     throw new catchError(error.message, 500)
   }
@@ -58,18 +56,20 @@ export async function createTodo(
 export async function updateTodo(
   updateTodoRequest: UpdateTodoRequest,
   todoId: string,
-  userId: string,
+  userId: string
 ): Promise<TodoItem> {
-
-  const valid = updateTodoSchema.validate(updateTodoRequest);
+  const valid = updateTodoSchema.validate(updateTodoRequest)
   if (valid.error) {
     logger.error('VALIDATION ERROR', valid.error)
     throw new catchError(valid.error.message, 400)
   }
 
   try {
-
-    const item = await todoAccess.updateTodo(updateTodoRequest as TodoUpdate, todoId, userId)
+    const item = await todoAccess.updateTodo(
+      updateTodoRequest as TodoUpdate,
+      todoId,
+      userId
+    )
 
     logger.info('Updated successfully', {
       userId,
@@ -77,19 +77,14 @@ export async function updateTodo(
       updated: updateTodo
     })
     return item
-    
   } catch (error) {
     logger.error(error)
     throw new catchError(error.message, 500)
   }
 }
 
-export async function deleteTodo(
-  todoId: string,
-  userId: string,
-) {
+export async function deleteTodo(todoId: string, userId: string) {
   try {
-
     const item = await todoAccess.deleteTodo(todoId, userId)
     logger.info('Deleted successfully', {
       userId,
@@ -106,7 +101,7 @@ export async function deleteTodo(
 export async function generateSignedUrl(attachmentId: string): Promise<string> {
   try {
     logger.info('Generating...')
-    const uploadUrl = await createAttachmentUrl(attachmentId)
+    const uploadUrl = await getAttachmentUrl(attachmentId)
     logger.info('Signed URL generated successfully')
 
     return uploadUrl
@@ -122,16 +117,13 @@ export async function updateAttachmentUrl(
   attachmentId: string
 ): Promise<void> {
   try {
-
     const attachmentUrl = getAttachmentUrl(attachmentId)
     await todoAccess.updateTodoItemAttachment(userId, todoId, attachmentUrl)
 
-    logger.info(
-      'AttachmentURL updated successfully',{
-        userId,
-        todoId
-      }
-    )
+    logger.info('AttachmentURL updated successfully', {
+      userId,
+      todoId
+    })
     return
   } catch (error) {
     logger.error(error)
@@ -149,4 +141,3 @@ const updateTodoSchema = Joi.object({
   dueDate: Joi.string().required(),
   done: Joi.boolean().required()
 })
-
